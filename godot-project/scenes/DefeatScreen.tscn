@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://defeatscreen"]
+[ext_resource type="Script" path="res://scripts/DefeatScreen.gd" id=1]
+[node name="DefeatScreen" type="Control"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 0.0
+margin_top = 0.0
+margin_right = 0.0
+margin_bottom = 0.0
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 7 # center
+alignment = 1
+spacing = 20
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBox"]
+custom_fonts/font = ExtResource(2)
+text = "You died!"
+theme_override_colors/font_color = Color(1,0.2,0.2,1)
+align = 1
+
+[node name="FinalScoreLabel" type="Label" parent="VBox"]
+custom_fonts/font = ExtResource(3)
+text = "Your Score: 0"
+theme_override_colors/font_color = Color(1,1,0,1)
+align = 1
+
+[node name="HighScoreLabel" type="Label" parent="VBox"]
+custom_fonts/font = ExtResource(3)
+text = "High Score: 0"
+theme_override_colors/font_color = Color(1,1,0,1)
+align = 1
+
+[node name="RestartButton" type="Button" parent="VBox"]
+text = "Restart"
+
+[node name="MainMenuButton" type="Button" parent="VBox"]
+text = "Main Menu"
+
+[node name="CloseButton" type="Button" parent="VBox"]
+text = "Close Game"
+
+[ext_resource type="Font" path="res://assets/fonts/TitleFont.ttf" id=2]
+[ext_resource type="Font" path="res://assets/fonts/RegularFont.ttf" id=3]

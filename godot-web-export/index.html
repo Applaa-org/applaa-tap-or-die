@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TAP OR DIE - Preview</title>
+<style>
+  body, html {
+    margin: 0; padding: 0; height: 100%; background-color: black; overflow: hidden;
+    display: flex; justify-content: center; align-items: center; flex-direction: column;
+    color: white; font-family: sans-serif;
+  }
+  #flashArea {
+    width: 95vw;
+    height: 60vh;
+    background-color: black;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 0 20px #000;
+    transition: background-color 0.3s ease;
+  }
+  #instructions {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #scoreboard {
+    font-size: 1.2rem;
+  }
+</style>
+</head>
+<body>
+  <div id="instructions">Tap ONLY when the GREEN box appears.<br>Spacebar or Tap to play.</div>
+  <div id="flashArea"></div>
+  <div id="scoreboard">Score: 0 - High Score: 0</div>
+
+<script>
+  const gameId = 'tapordie_a1b2c3d4';
+  const flashArea = document.getElementById('flashArea');
+  const scoreboard = document.getElementById('scoreboard');
+  const signals = [
+    {color: 'green', correct: true},
+    {color: 'red', correct: false},
+    {color: 'blue', correct: false},
+    {color: 'yellow', correct: false},
+    {color: 'magenta', correct: false},
+    {color: 'cyan', correct: false}
+  ];
+
+  let score = 0;
+  let highScore = 0;
+  let lastPlayer = "";
+  let isWaitingForTap = false;
+  let timeoutHandle;
+
+  function updateScoreboard() {
+    scoreboard.textContent = `Score: ${score} - High Score: ${highScore}`;
+  }
+
+  function resetFlash() {
+    flashArea.style.backgroundColor = 'black';
+    isWaitingForTap = false;
+  }
+
+  function showSignal() {
+    const idx = Math.floor(Math.random() * signals.length);
+    const signal = signals[idx];
+    flashArea.style.backgroundColor = signal.color;
+    isWaitingForTap = true;
+
+    timeoutHandle = setTimeout(() => {
+      if(signal.correct) {
+        // Missed correct flash → game over
+        saveScore();
+        alert(`You missed the green flash! Game Over. Final score: ${score}`);
+        resetGame();
+      } else {
+        // No tap on wrong flash OK, continue
+        resetFlash();
+        setTimeout(showSignal, 1000);
+      }
+    }, 1200);
+
+    currentSignalIsCorrect = signal.correct;
+  }
+
+  function saveScore() {
+    if(window.parent) {
+      window.parent.postMessage({
+        type: 'applaa-game-save-score',
+        gameId: gameId,
+        playerName: lastPlayer || "Player",
+        score: score
+      }, '*');
+    }
+  }
+
+  function resetGame() {
+    score = 0;
+    updateScoreboard();
+    resetFlash();
+    setTimeout(showSignal, 1000);
+  }
+
+  function onPlayerTap() {
+    if(!isWaitingForTap) return; // Ignore taps out of window
+
+    clearTimeout(timeoutHandle);
+    if(currentSignalIsCorrect) {
+      score++;
+      if(score > highScore) {
+        highScore = score;
+      }
+      updateScoreboard();
+      resetFlash();
+      setTimeout(showSignal, 400);
+    } else {
+      saveScore();
+      alert(`Wrong tap! Game Over. Final score: ${score}`);
+      resetGame();
+    }
+  }
+
+  window.addEventListener('message', (event) => {
+    if(event.data.type === 'applaa-game-data-loaded' && event.data.gameId === gameId) {
+      const data = event.data.data;
+      highScore = data.highScore || 0;
+      lastPlayer = data.lastPlayerName || "";
+      updateScoreboard();
+    }
+  });
+
+  // Initialize display to zero immediately
+  updateScoreboard();
+
+  // Load data on start
+  window.parent.postMessage({type: 'applaa-game-load-data', gameId: gameId}, '*');
+
+  // Input handlers
+  window.addEventListener('click', () => {
+    onPlayerTap();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if(e.code === 'Space') {
+      onPlayerTap();
+    }
+  });
+
+  // Start the first flash after 1 second delay
+  setTimeout(showSignal, 1000);
+</script>
+</body>
+</html>

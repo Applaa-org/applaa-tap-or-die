@@ -1,0 +1,33 @@
+{
+  "game": {
+    "name": "TAP OR DIE",
+    "type": "2D",
+    "genre": "reflex",
+    "description": "Reflex game where player taps only on correct signal flashes."
+  },
+  "settings": {
+    "window": {
+      "width": 800,
+      "height": 600
+    },
+    "physics": {
+      "gravity": 0
+    }
+  },
+  "player": {
+    "name": "Player",
+    "health": 1,
+    "speed": 0,
+    "abilities": ["tap"]
+  },
+  "entities": {},
+  "levels": [],
+  "logic": {
+    "winCondition": "survive",
+    "loseCondition": "wrong_tap",
+    "scoring": {
+      "pointsPerKill": 0,
+      "pointsPerCollectible": 0
+    }
+  }
+}
